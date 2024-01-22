@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -61,12 +62,12 @@ public class ManagerController {
 
     @RequestMapping("/addSkillActivityAction")
     public ResponseEntity<?> addSkillActivityAction(@RequestParam("activityName") String activityName,
-                                         @RequestParam("goodsId") long goodsId,
-                                         @RequestParam("startTime") String startTime,
-                                         @RequestParam("endTime") String endTime,
-                                         @RequestParam("availableStock") int availableStock,
-                                         @RequestParam("seckillPrice") int seckillPrice,
-                                         @RequestParam("oldPrice") int oldPrice){
+                                                    @RequestParam("goodsId") long goodsId,
+                                                    @RequestParam("startTime") String startTime,
+                                                    @RequestParam("endTime") String endTime,
+                                                    @RequestParam("availableStock") int availableStock,
+                                                    @RequestParam("seckillPrice") int seckillPrice,
+                                                    @RequestParam("oldPrice") int oldPrice){
         try{
             SeckillActivity seckillActivity = new SeckillActivity();
             seckillActivity.setActivityName(activityName);
@@ -95,8 +96,11 @@ public class ManagerController {
 
 
     @RequestMapping("/pushSeckillCacheAction")
-    public ResponseEntity<?> pushSkillCache(@RequestParam("seckillId")long seckillId){
+    public ResponseEntity<?> pushSkillCache(HttpSession session,
+                                            @RequestParam("seckillId")long seckillId){
         try {
+            if(session.getAttribute("userId")==null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have the admin authority");
             seckillActivityService.pushSeckillActivityInfoToCache(seckillId);
             return ResponseEntity.ok().build();
         }catch (Exception e) {
