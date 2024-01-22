@@ -36,7 +36,6 @@ public class CreateOrderReceiver {
             log.error("order insert error order={}", JSON.toJSONString(order));
             throw new RuntimeException("order creating failed");
         }
-        goodsService.lockStock(order.getGoodsId());
         //send delay message
         orderMessageSender.sendPayStatusCheckDelayMessage(JSON.toJSONString(order));
 
