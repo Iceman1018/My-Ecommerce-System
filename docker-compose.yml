@@ -30,6 +30,15 @@ services:
      - "8500:8500"
     command: agent -dev -client 0.0.0.0
 
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
 volumes:
   elasticsearch-data:
   redis-data:
+  rabbitmq-data:
