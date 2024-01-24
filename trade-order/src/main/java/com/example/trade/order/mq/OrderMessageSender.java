@@ -17,12 +17,12 @@ public class OrderMessageSender {
 
     public void sendSecPaySuccessMessage(String message){
         log.info("Send paying success message:{}",message);
-        amqpTemplate.convertAndSend("order-event-exchange","seckill.order.pay.success",message);
+        amqpTemplate.convertAndSend("order-event-exchange","deal.order.pay.success",message);
     }
 
-    public void sendRevertSeckillOrderMessage(String message){
-        log.info("Seckill order revert message:{}",message);
-        amqpTemplate.convertAndSend("order-event-exchange","seckill.order.revert",message);
+    public void sendRevertDealOrderMessage(String message){
+        log.info("Deal order revert message:{}",message);
+        amqpTemplate.convertAndSend("order-event-exchange","deal.order.revert",message);
     }
 
     public void sendCreateOrderMessage(String message){

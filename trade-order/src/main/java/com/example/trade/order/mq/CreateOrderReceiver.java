@@ -1,8 +1,8 @@
 package com.example.trade.order.mq;
 
 import com.alibaba.fastjson.JSON;
-import com.example.trade.goods.service.GoodsService;
 import com.example.trade.order.Service.LimitBuyService;
+import com.example.trade.order.client.GoodsFeignClient;
 import com.example.trade.order.db.dao.OrderDao;
 import com.example.trade.order.db.model.Order;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +15,6 @@ import org.springframework.stereotype.Component;
 public class CreateOrderReceiver {
     @Autowired
     private OrderDao orderDao;
-
-    @Autowired
-    private GoodsService goodsService;
     @Autowired
     private OrderMessageSender orderMessageSender;
     @Autowired

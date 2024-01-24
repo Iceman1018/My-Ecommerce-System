@@ -1,8 +1,8 @@
 package com.example.trade.web.portal.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.example.trade.order.Service.OrderService;
-import com.example.trade.order.db.model.Order;
+import com.example.trade.web.portal.client.OrderFeignClient;
+import com.example.trade.web.portal.client.model.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
 @RestController
 public class OrderController {
     @Autowired
-    OrderService orderService;
+    OrderFeignClient orderService;
     @RequestMapping("/order/query/{orderId}")
     public ResponseEntity<?> orderQuery(HttpSession session, @PathVariable long orderId){
         if(session.getAttribute("userId")==null){

@@ -1,8 +1,9 @@
 package com.example.trade.web.portal.controller;
 
-import com.example.trade.goods.db.model.Goods;
-import com.example.trade.goods.service.GoodsService;
-import com.example.trade.goods.service.SearchService;
+
+
+import com.example.trade.web.portal.client.GoodsFeignClient;
+import com.example.trade.web.portal.client.model.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +15,12 @@ import java.util.List;
 @RestController
 public class GoodsController {
     @Autowired
-    private GoodsService goodsService;
-    @Autowired
-    private SearchService searchService;
+    private GoodsFeignClient goodsService;
 
     @RequestMapping("/goods/searchAction")
     public ResponseEntity<?> goodsSearch(@RequestParam("searchWords") String searchWords){
         log.info("search searchWord:{}",searchWords);
-        List<Goods> goodsList=searchService.searchGoodsList(searchWords,0,10);
+        List<Goods> goodsList=goodsService.searchGoodsList(searchWords,0,10);
         return ResponseEntity.ok(goodsList);
     }
     @RequestMapping("/goods/{goodsId}")

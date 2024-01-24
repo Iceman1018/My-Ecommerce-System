@@ -1,5 +1,6 @@
 package com.example.trade.web.portal;
-import com.example.trade.order.utils.RedisWorker;
+
+import com.example.trade.common.utils.RedisWorker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

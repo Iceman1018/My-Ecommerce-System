@@ -1,12 +1,12 @@
 package com.example.trade.webmanager;
-
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.ComponentScan;
 
+@EnableFeignClients
 @ComponentScan(basePackages = {"com.example"})
-@MapperScan({"com.example.trade.user.db.mappers","com.example.trade.goods.db.mappers","com.example.trade.order.db.mappers","com.example.trade.lightningdeal.db.mappers"})
 @SpringBootApplication
 public class TradeWebManagerApplication {
 

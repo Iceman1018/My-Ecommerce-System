@@ -43,7 +43,7 @@
         <!-- 对应要操作的表 -->
         <!--    <table schema="" tableName="goods" domainObjectName="Goods" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false" selectByExampleQueryId="false"></table>-->
 
-        <table schema="" tableName="seckill_activity" domainObjectName="SeckillActivity" enableCountByExample="false"
+        <table schema="" tableName="deal_activity" domainObjectName="DealActivity" enableCountByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"
                selectByExampleQueryId="false"></table>
 

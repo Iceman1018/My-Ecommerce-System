@@ -8,7 +8,7 @@ public interface UserService {
     User createUser(String userName,String email,String password,String tag);
 
     boolean UserLogin(HttpSession session, String email, String password);
-    boolean UserLogin(String email, String password);
+    Long UserLogin(String email, String password);
     User queryUser(Long userId);
 
 }

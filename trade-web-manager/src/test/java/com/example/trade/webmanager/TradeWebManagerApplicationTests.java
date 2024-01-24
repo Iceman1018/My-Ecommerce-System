@@ -1,9 +1,9 @@
 package com.example.trade.webmanager;
 
-import com.example.trade.goods.db.model.Goods;
-import com.example.trade.goods.service.GoodsService;
-import com.example.trade.lightningdeal.db.model.SeckillActivity;
-import com.example.trade.lightningdeal.service.SeckillActivityService;
+import com.example.trade.webmanager.client.DealFeignClient;
+import com.example.trade.webmanager.client.GoodsFeignClient;
+import com.example.trade.webmanager.client.model.DealActivity;
+import com.example.trade.webmanager.client.model.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,10 @@ import java.util.Date;
 class TradeWebManagerApplicationTests {
 
     @Autowired
-    GoodsService goodsService;
+    GoodsFeignClient goodsService;
 
     @Autowired
-    SeckillActivityService seckillActivityService;
+    DealFeignClient dealActivityService;
 
     @Test
     void addGoodsTest() {
@@ -44,27 +44,27 @@ class TradeWebManagerApplicationTests {
         log.info("add goods /result={}",result);
     }
     @Test
-    void addSeckillTest() {
+    void addDealTest() {
         try {
-            SeckillActivity seckillActivity = new SeckillActivity();
-            seckillActivity.setActivityName("恒宝大寿");
-            seckillActivity.setGoodsId(new Long(1));
+            DealActivity dealActivity = new DealActivity();
+            dealActivity.setActivityName("自动缓存测试2");
+            dealActivity.setGoodsId(new Long(19));
 
-            String startTime = "2024-01-20 14:18:00";
-            String endTime = "2024-01-20 14:18:00";
+            String startTime = "2024-01-24 16:27:00";
+            String endTime = "2024-01-24 16:45:00";
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-            seckillActivity.setStartTime(format.parse(startTime));
-            seckillActivity.setEndTime(format.parse(endTime));
-            seckillActivity.setAvailableStock(50);
+            dealActivity.setStartTime(format.parse(startTime));
+            dealActivity.setEndTime(format.parse(endTime));
+            dealActivity.setAvailableStock(50);
 
-            seckillActivity.setActivityStatus(1);
+            dealActivity.setActivityStatus(1);
 
-            seckillActivity.setLockStock(0);
-            seckillActivity.setSeckillPrice(10);
-            seckillActivity.setOldPrice(100);
-            seckillActivity.setCreateTime(new Date());
-            seckillActivityService.insertSeckillActivity(seckillActivity);
-            log.info("seckill created");
+            dealActivity.setLockStock(0);
+            dealActivity.setDealPrice(10);
+            dealActivity.setOldPrice(100);
+            dealActivity.setCreateTime(new Date());
+            dealActivityService.insertDealActivity(dealActivity);
+            log.info("deal created");
         }catch (Exception e) {
             log.error("error");
         }

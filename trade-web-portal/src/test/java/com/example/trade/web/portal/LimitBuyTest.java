@@ -1,6 +1,6 @@
 package com.example.trade.web.portal;
 
-import com.example.trade.order.Service.LimitBuyService;
+import com.example.trade.common.utils.RedisWorker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,11 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class LimitBuyTest {
     @Autowired
-    public LimitBuyService limitBuyService;
+    public RedisWorker limitBuyService;
 
     @Test
     void addLimitMemberTest(){
-        limitBuyService.addLimitMemeber(123456L,668899L);
+        limitBuyService.addLimitMember(123456L,668899L);
     }
     @Test
     void isInLimitMemberTest(){

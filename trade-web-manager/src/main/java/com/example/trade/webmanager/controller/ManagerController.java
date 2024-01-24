@@ -1,10 +1,8 @@
 package com.example.trade.webmanager.controller;
-
-import com.example.trade.goods.db.dao.GoodsDao;
-import com.example.trade.goods.db.model.Goods;
-import com.example.trade.goods.service.GoodsService;
-import com.example.trade.lightningdeal.db.model.SeckillActivity;
-import com.example.trade.lightningdeal.service.SeckillActivityService;
+import com.example.trade.webmanager.client.DealFeignClient;
+import com.example.trade.webmanager.client.GoodsFeignClient;
+import com.example.trade.webmanager.client.model.DealActivity;
+import com.example.trade.webmanager.client.model.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,22 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
+
 
 @Slf4j
 @RestController
 public class ManagerController {
     @Autowired
-    private GoodsService goodsService;
+    private GoodsFeignClient goodsService;
 
     @Autowired
-    private SeckillActivityService seckillActivityService;
+    private DealFeignClient dealActivityService;
 
 
-    @RequestMapping("/addGoodsAction")
+    @RequestMapping("/admin/addGoodsAction")
     public ResponseEntity<?> addGoodsAction(@RequestParam("title") String title,
                                          @RequestParam("number") String number,
                                          @RequestParam("brand") String brand,
@@ -60,51 +57,37 @@ public class ManagerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding goods");
     }
 
-    @RequestMapping("/addSkillActivityAction")
-    public ResponseEntity<?> addSkillActivityAction(@RequestParam("activityName") String activityName,
+    @RequestMapping("/admin/addDealActivityAction")
+    public ResponseEntity<?> addDealActivityAction(@RequestParam("activityName") String activityName,
                                                     @RequestParam("goodsId") long goodsId,
                                                     @RequestParam("startTime") String startTime,
                                                     @RequestParam("endTime") String endTime,
                                                     @RequestParam("availableStock") int availableStock,
-                                                    @RequestParam("seckillPrice") int seckillPrice,
+                                                    @RequestParam("dealPrice") int dealPrice,
                                                     @RequestParam("oldPrice") int oldPrice){
         try{
-            SeckillActivity seckillActivity = new SeckillActivity();
-            seckillActivity.setActivityName(activityName);
-            seckillActivity.setGoodsId(goodsId);
+            DealActivity dealActivity = new DealActivity();
+            dealActivity.setActivityName(activityName);
+            dealActivity.setGoodsId(goodsId);
 
             startTime=startTime.substring(0,10)+" "+startTime.substring(11);
             endTime=endTime.substring(0,10)+" "+endTime.substring(11);
             SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd hh:mm");
-            seckillActivity.setStartTime(format.parse(startTime));
-            seckillActivity.setEndTime(format.parse(endTime));
-            seckillActivity.setAvailableStock(availableStock);
+            dealActivity.setStartTime(format.parse(startTime));
+            dealActivity.setEndTime(format.parse(endTime));
+            dealActivity.setAvailableStock(availableStock);
 
-            seckillActivity.setActivityStatus(1);
+            dealActivity.setActivityStatus(1);
 
-            seckillActivity.setLockStock(0);
-            seckillActivity.setSeckillPrice(seckillPrice);
-            seckillActivity.setOldPrice(oldPrice);
-            seckillActivity.setCreateTime(new Date());
-            seckillActivityService.insertSeckillActivity(seckillActivity);
+            dealActivity.setLockStock(0);
+            dealActivity.setDealPrice(dealPrice);
+            dealActivity.setOldPrice(oldPrice);
+            dealActivity.setCreateTime(new Date());
+            dealActivityService.insertDealActivity(dealActivity);
             return ResponseEntity.ok().build();
         }catch (Exception e){
             log.error("addSkillActivityAction error",e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding skill activity");
-        }
-    }
-
-
-    @RequestMapping("/pushSeckillCacheAction")
-    public ResponseEntity<?> pushSkillCache(HttpSession session,
-                                            @RequestParam("seckillId")long seckillId){
-        try {
-            if(session.getAttribute("userId")==null)
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You don't have the admin authority");
-            seckillActivityService.pushSeckillActivityInfoToCache(seckillId);
-            return ResponseEntity.ok().build();
-        }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding activity into cache");
         }
     }
 }

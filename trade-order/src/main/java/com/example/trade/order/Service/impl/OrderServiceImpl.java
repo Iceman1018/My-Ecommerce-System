@@ -1,16 +1,13 @@
 package com.example.trade.order.Service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.example.trade.goods.db.dao.GoodsDao;
-import com.example.trade.goods.db.model.Goods;
-import com.example.trade.goods.service.GoodsService;
+import com.example.trade.common.model.Goods;
+import com.example.trade.common.utils.SnowflakeIdWorker;
 import com.example.trade.order.Service.OrderService;
+import com.example.trade.order.client.GoodsFeignClient;
 import com.example.trade.order.db.dao.OrderDao;
 import com.example.trade.order.db.model.Order;
 import com.example.trade.order.mq.OrderMessageSender;
-import com.example.trade.order.utils.SnowflakeIdWorker;
-import com.example.trade.user.Service.UserService;
-import com.example.trade.user.db.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,23 +21,15 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderDao orderDao;
     @Autowired
-    GoodsService goodsService;
+    GoodsFeignClient goodsService;
 
-    @Autowired
-    UserService userService;
 
     @Autowired
     private OrderMessageSender orderMessageSender;
-
     private SnowflakeIdWorker snowflakeIdWorker=new SnowflakeIdWorker(6,8);
     @Override
     public Order createOrder(long userId, long goodsId){
-        User user=userService.queryUser(userId);
         Goods goods=goodsService.queryGoodsById(goodsId);
-        if(user==null){
-            log.error("user is null userId={}",userId);
-            throw new RuntimeException("user does not exist");
-        }
         if(goods==null){
             log.error("goods is null goodsId={}",goodsId);
             throw new RuntimeException("goods does not exist");
