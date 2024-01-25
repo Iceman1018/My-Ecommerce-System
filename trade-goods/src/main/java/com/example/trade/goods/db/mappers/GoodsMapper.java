@@ -1,6 +1,7 @@
 package com.example.trade.goods.db.mappers;
 
 import com.example.trade.goods.db.model.Goods;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -58,4 +59,10 @@ public interface GoodsMapper {
     int deductStock(Long id);
 
     int revertStock(Long id);
+
+    int lockStockMulti(@Param("id") Long id, @Param("num") Integer num);
+
+    int deductStockMulti(@Param("id") Long id, @Param("num") Integer num);
+
+    int revertStockMulti(@Param("id") Long id, @Param("num") Integer num);
 }

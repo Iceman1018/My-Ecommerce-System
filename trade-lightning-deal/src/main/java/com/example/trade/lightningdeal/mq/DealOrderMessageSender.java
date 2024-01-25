@@ -14,4 +14,19 @@ public class DealOrderMessageSender {
         log.info("Sending order creation message: {}",message);
         amqpTemplate.convertAndSend("order-event-exchange","to.create.order",message);
     }
+
+    public void sendCreateActivityMessage(String message){
+        log.info("Sending deal activity creation message to lock the stock: {}",message);
+        amqpTemplate.convertAndSend("order-event-exchange","to.lock.goods.stock",message);
+    }
+
+    public void sendActivityExpirationMessage(String message){
+        log.info("Sending deal activity expiration message to release the rest stock: {}",message);
+        amqpTemplate.convertAndSend("order-event-exchange","to.revert.goods.stock",message);
+    }
+
+    public void sendDealCacheMessage(String message){
+        log.info("Sending deal cache message: {}",message);
+        amqpTemplate.convertAndSend("order-event-exchange","deal.to.cache",message);
+    }
 }

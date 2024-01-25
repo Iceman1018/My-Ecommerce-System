@@ -119,6 +119,26 @@ public class RabbitMqConfig {
     }
 
 
+    @Bean
+    public Queue DealtoCacheQueue() {
+        Queue queue = new Queue("deal.to.cache.queue", true, false, false);
+        return queue;
+    }
+
+    @Bean
+    public Queue lockGoodsStockQueue(){
+        Queue queue = new Queue("lock.goods.stock.queue",true,false,false);
+        return queue;
+    }
+
+
+    @Bean
+    public Queue revertGoodsStockQueue() {
+        Queue queue = new Queue("revert.goods.stock.queue", true, false, false);
+        return queue;
+    }
+
+
     /**
      * 创建订单成功消息，绑定
      * 订单延迟队列 绑定到交换机
@@ -183,6 +203,33 @@ public class RabbitMqConfig {
                 Binding.DestinationType.QUEUE,
                 "order-event-exchange",
                 "deal.order.pay.success",
+                null);
+    }
+
+    @Bean
+    public Binding dealToCacheBinding() {
+        return new Binding("deal.to.cache.queue",
+                Binding.DestinationType.QUEUE,
+                "order-event-exchange",
+                "deal.to.cache",
+                null);
+    }
+
+    @Bean
+    public Binding lockGoodsStockBinding() {
+        return new Binding("lock.goods.stock.queue",
+                Binding.DestinationType.QUEUE,
+                "order-event-exchange",
+                "to.lock.goods.stock",
+                null);
+    }
+
+    @Bean
+    public Binding revertGoodsStockBinding() {
+        return new Binding("revert.goods.stock.queue",
+                Binding.DestinationType.QUEUE,
+                "order-event-exchange",
+                "to.revert.goods.stock",
                 null);
     }
 }

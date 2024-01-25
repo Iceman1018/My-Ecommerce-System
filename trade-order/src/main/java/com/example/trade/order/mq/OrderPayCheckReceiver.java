@@ -35,9 +35,10 @@ public class OrderPayCheckReceiver {
             log.info("订单{}超时支付，关闭订单",orderInfo.getId());
             orderInfo.setStatus(99);
             orderDao.updateOrder(orderInfo);
-            goodsService.revertStock(orderInfo.getGoodsId());
             if(orderInfo.getActivityType()==1)
                 orderMessageSender.sendRevertDealOrderMessage(JSON.toJSONString(order));
+            else
+                goodsService.revertStock(orderInfo.getGoodsId());
 
         }
 

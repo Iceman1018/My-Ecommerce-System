@@ -16,8 +16,11 @@ public interface DealActivityDao {
 
     List<DealActivity> queryActivitiesByStatus(int status);
 
-    boolean updateAvailableStockByPrimaryKey(long id);
+    boolean updateDealActivityStatus(long id);
 
+    List<DealActivity> queryExpiredActivities(Date nowTime);
+
+    boolean closeExpiredActivities(Date nowTime);
     /**
      * 锁定秒杀的库存
      * @param id

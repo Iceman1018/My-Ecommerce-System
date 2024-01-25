@@ -41,7 +41,9 @@ public class DealOrderMessageReceiver {
         log.info("Deal order pay unfinished,got the message:{}", message);
         Order order = JSON.parseObject(message, Order.class);
         redisWorker.removeLimitMember(order.getActivityId(), order.getUserId());
+        redisWorker.stockRevert(order.getActivityId());
         //秒杀库存回补
         dealActivityService.revertStock(order.getActivityId());
+
     }
 }

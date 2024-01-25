@@ -4,13 +4,13 @@ import com.example.trade.common.model.Goods;
 import com.example.trade.common.model.Order;
 import com.example.trade.common.utils.RedisWorker;
 import com.example.trade.common.utils.SnowflakeIdWorker;
-import com.example.trade.lightningdeal.client.GoodsFeignClient;
 import com.example.trade.lightningdeal.db.dao.DealActivityDao;
 import com.example.trade.lightningdeal.db.model.DealActivity;
 import com.example.trade.lightningdeal.mq.DealOrderMessageSender;
 import com.example.trade.lightningdeal.service.DealActivityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -28,6 +28,19 @@ public class DealActivityServiceImpl implements DealActivityService {
     @Autowired
     private RedisWorker redisWorker;
 
+    @Scheduled(fixedRate = 600000)
+    public void updateDealStatus() {
+        List<DealActivity> list=dealActivityDao.queryExpiredActivities(new Date());
+        for(DealActivity dealActivity:list)
+        {
+            log.info("Found expired Activity id: {}",dealActivity.getId());
+            if(dealActivityDao.updateDealActivityStatus(dealActivity.getId())) {
+                int restStock = dealActivity.getAvailableStock() + dealActivity.getLockStock();
+                dealOrderMessageSender.sendActivityExpirationMessage(dealActivity.getGoodsId() + ":" + restStock);
+            }
+        }
+    }
+
 
 
     private SnowflakeIdWorker snowflakeIdWorker = new SnowflakeIdWorker(6, 8);
@@ -38,7 +51,7 @@ public class DealActivityServiceImpl implements DealActivityService {
             String key="stock:" + dealActivity.getId();
             System.out.println(key);
             redisWorker.setValue(key, new Long(dealActivity.getAvailableStock()));
-
+            dealOrderMessageSender.sendCreateActivityMessage(dealActivity.getGoodsId()+":"+dealActivity.getAvailableStock());
             return true;
         }
         return false;
@@ -55,70 +68,25 @@ public class DealActivityServiceImpl implements DealActivityService {
     }
 
     @Override
-    public boolean processDealReqBase(long dealActivityId){
-        DealActivity dealActivity=dealActivityDao.queryDealActivityById(dealActivityId);
-
-        if(dealActivity==null){
-            log.error("seckActivityId={} No such deal Activity",dealActivityId);
-            throw new RuntimeException("No such deal Activity");
-        }
-        int availableStock=dealActivity.getAvailableStock();
-        if(availableStock>0){
-            log.info("Purchase successfully");
-            dealActivityDao.updateAvailableStockByPrimaryKey(dealActivityId);
-            return true;
-        }else{
-            log.info("Sold out");
-            return false;
-        }
-    }
-    @Override
-    public boolean processDealReqRedis(long dealActivityId) {
-
-        String key="stock:"+dealActivityId;
-        boolean checkResult=redisWorker.stockDeductCheck(key);
-        if(!checkResult){
-            return false;
-        }
-        DealActivity dealActivity=dealActivityDao.queryDealActivityById(dealActivityId);
-
-        if(dealActivity==null){
-            log.error("seckActivityId={} No such deal Activity",dealActivityId);
-            throw new RuntimeException("No such deal Activity");
-        }
-        int availableStock=dealActivity.getAvailableStock();
-        if(availableStock>0){
-            log.info("Purchase successfully");
-            dealActivityDao.updateAvailableStockByPrimaryKey(dealActivityId);
-            return true;
-        }else{
-            log.info("Sold out");
-            return false;
-        }
-
-    }
-
-    @Override
     public Order processDeal(long userId, long dealActivityId) {
-        //1.校验用户是否有购买资格
+        //1.查询对应的秒杀活动信息
+        DealActivity dealActivity=dealActivityDao.queryDealActivityById(dealActivityId);
+        if(dealActivity==null){
+            log.error("seckActivityId={} No such deal Activity",dealActivityId);
+            throw new RuntimeException("No such deal Activity");
+        }
+        //2.校验用户是否有购买资格
         if (redisWorker.isInLimitMember(dealActivityId, userId)) {
             log.error("当前用户已经购买过不能重复购买 dealActivityId={} userId={}", dealActivityId, userId);
             throw new RuntimeException("当前用户已经购买过,不能重复购买");
         }
-        //2.使用Redis中Lua先进行库存校验
+        //3.使用Redis中Lua先进行库存校验
         String key="stock:"+dealActivityId;
         boolean checkResult=redisWorker.stockDeductCheck(key);
         if(!checkResult){
             log.error("Out of stock, dealActivityId={} userId={}", dealActivityId, userId);
             throw new RuntimeException("Sold out, purchase failed");
         }
-        //3.查询对应的秒杀活动信息
-        DealActivity dealActivity=dealActivityDao.queryDealActivityById(dealActivityId);
-        if(dealActivity==null){
-            log.error("seckActivityId={} No such deal Activity",dealActivityId);
-            throw new RuntimeException("No such deal Activity");
-        }
-
         //4.锁定库存
         boolean lockStockRes = dealActivityDao.lockStock(dealActivityId);
         if (!lockStockRes) {

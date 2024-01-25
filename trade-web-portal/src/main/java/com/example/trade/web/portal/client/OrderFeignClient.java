@@ -17,6 +17,6 @@ public interface OrderFeignClient {
     Order queryOrder(@RequestParam("orderId") long orderId);
 
     @RequestMapping("/api/order/payOrder")
-    void payOrder(@RequestParam("orderId") long orderId);
+    boolean payOrder(@RequestParam("orderId") long orderId);
 
 }

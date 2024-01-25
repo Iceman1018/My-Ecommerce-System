@@ -51,13 +51,11 @@ public class OrderController {
             log.error("This order does not belong to you");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("This order does not belong to you");
         }
-        try {
-            orderService.payOrder(orderId);
+        if(orderService.payOrder(orderId)) {
             log.info("Pay successfully");
             return ResponseEntity.ok().build();
-        }catch (Exception e){
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        } else{
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("pay failed");
         }
     }
     @RequestMapping("/order/create/{goodsId}")
@@ -68,14 +66,13 @@ public class OrderController {
         }
         Long userId=((Number)session.getAttribute("userId")).longValue();
         log.info("userId={},goodsId={}",userId,goodsId);
-        try {
-            Order order = orderService.createOrder(userId, goodsId);
+        Order order = orderService.createOrder(userId, goodsId);
+        if(order!=null) {
             log.info("Order created!");
             return ResponseEntity.ok(order);
-        }catch (Exception e)
-        {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }else {
+            log.error("Order creation failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("order creation failed");
         }
     }
 }

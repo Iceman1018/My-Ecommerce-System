@@ -37,10 +37,6 @@ public class DealActivityDaoImpl implements DealActivityDao {
         return dealActivityMapper.queryActivitiesByStatus(status);
     }
 
-    @Override
-    public boolean updateAvailableStockByPrimaryKey(long id){
-        return dealActivityMapper.updateAvailableStockByPrimaryKey(id)>0;
-    }
 
     @Override
     public boolean lockStock(long id) {
@@ -73,4 +69,16 @@ public class DealActivityDaoImpl implements DealActivityDao {
         return true;
     }
 
+    @Override
+    public boolean updateDealActivityStatus(long id){
+        return dealActivityMapper.setActivityStatus(id)>0;
+    }
+
+    @Override
+    public boolean closeExpiredActivities(Date nowTime){
+        return dealActivityMapper.closeExpiredActivities(nowTime)>0;
+    }
+
+    @Override
+    public List<DealActivity> queryExpiredActivities(Date nowTime){return dealActivityMapper.queryExpiredActivities(nowTime);}
 }

@@ -17,4 +17,8 @@ public interface GoodsService {
 
     boolean revertStock(long id);
 
+    boolean lockStock(long id,int num);
+
+    boolean revertStock(long id,int num);
+
 }

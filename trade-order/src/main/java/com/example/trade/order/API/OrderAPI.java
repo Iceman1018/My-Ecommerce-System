@@ -21,8 +21,13 @@ public class OrderAPI {
     @GetMapping("/api/order/createOrder")
     @ResponseBody
     public Order createOrder(long userId, long goodsId) {
-        log.info("createOrder userId:{} goodsId:{}", userId, goodsId);
-        return orderService.createOrder(userId, goodsId);
+        try {
+            log.info("createOrder userId:{} goodsId:{}", userId, goodsId);
+            return orderService.createOrder(userId, goodsId);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
     }
     @GetMapping("/api/order/queryOrder")
     @ResponseBody
@@ -33,9 +38,15 @@ public class OrderAPI {
 
     @GetMapping("/api/order/payOrder")
     @ResponseBody
-    public void payOrder(long orderId) {
+    public boolean payOrder(long orderId) {
         log.info("payOrder orderId:{}", orderId);
-        orderService.payOrder(orderId);
+        try {
+            orderService.payOrder(orderId);
+            return true;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     @GetMapping("/api/order/queryOrderListByUserId")

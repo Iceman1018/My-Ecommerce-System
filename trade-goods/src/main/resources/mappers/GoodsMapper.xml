@@ -254,4 +254,24 @@
         lock_stock=lock_stock-1
     where id=#{id,jdbcType=BIGINT}
   </update>
+
+  <update id="lockStockMulti">
+    update goods
+    set available_stock=available_stock-#{num},
+        lock_stock=lock_stock+#{num}
+    where id=#{id,jdbcType=BIGINT}
+  </update>
+  <update id="deductStockMulti">
+    update goods
+    set lock_stock=lock_stock-#{num},
+        sale_num=sale_num+#{num}
+    where id=#{id,jdbcType=BIGINT}
+  </update>
+  <update id="revertStockMulti">
+    update goods
+    set available_stock=available_stock+#{num},
+        lock_stock=lock_stock-#{num}
+    where id=#{id,jdbcType=BIGINT}
+  </update>
+
 </mapper>

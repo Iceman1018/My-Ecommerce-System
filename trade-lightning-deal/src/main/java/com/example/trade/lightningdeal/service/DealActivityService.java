@@ -12,9 +12,6 @@ public interface DealActivityService {
     DealActivity queryDealActivityById(long id);
     List<DealActivity> queryActivitysByStatus(int status);
 
-    boolean processDealReqBase(long dealActivityId);
-    boolean processDealReqRedis(long dealActivityId);
-
     Order processDeal(long userId, long dealActivityId);
     boolean lockStock(long id);
 

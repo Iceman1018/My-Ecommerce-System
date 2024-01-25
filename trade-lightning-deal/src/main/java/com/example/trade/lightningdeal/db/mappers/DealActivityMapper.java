@@ -32,5 +32,7 @@ public interface DealActivityMapper {
     int revertStock(Long id);
 
     List<DealActivity> queryActivitiesByStartTime(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
-
+    List<DealActivity> queryExpiredActivities(@Param("nowDate") Date nowDate);
+    int closeExpiredActivities(@Param("nowDate") Date nowDate);
+    int setActivityStatus(Long id);
 }

@@ -40,6 +40,14 @@ public class GoodsServiceimpl implements GoodsService {
         return goodsDao.revertStock(id);
     }
 
+    @Override
+    public boolean lockStock(long id,int num){ return goodsDao.lockStock(id,num); }
+
+    @Override
+    public boolean revertStock(long id,int num){
+        return goodsDao.revertStock(id,num);
+    }
+
 
 
 

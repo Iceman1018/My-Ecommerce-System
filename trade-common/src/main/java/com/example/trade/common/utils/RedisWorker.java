@@ -131,6 +131,12 @@ public class RedisWorker {
             }
         }
     }
+
+    public void stockRevert(Long dealActivityId){
+        Jedis jedisClient = jedisPool.getResource();
+        jedisClient.incr("stock:"+dealActivityId);
+        jedisClient.close();
+    }
     public void addLimitMember(long dealActivityId, long userId) {
         Jedis jedisClient = jedisPool.getResource();
         jedisClient.sadd("deal_activity_members:" + dealActivityId, String.valueOf(userId));

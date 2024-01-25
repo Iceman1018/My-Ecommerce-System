@@ -168,6 +168,23 @@
           from deal_activity
           where activity_status=#{status,jdbcType=SMALLINT}
   </select>
+
+  <select id="queryActivitiesByStartTime"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM deal_activity
+    WHERE end_time > #{startDate}
+    AND #{endDate} >= start_time
+  </select>
+
+  <select id="queryExpiredActivities" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM deal_activity
+    WHERE #{nowDate} >= end_time
+      AND activity_status=1
+  </select>
+
   
   <update id="updateAvailableStockByPrimaryKey" parameterType="java.lang.Long">
     update deal_activity
@@ -197,19 +214,19 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="queryActivitiesByStartTime"  resultMap="BaseResultMap">
-    SELECT
-    <include refid="Base_Column_List"/>
-    FROM deal_activity
-    WHERE end_time > #{startDate}
-    AND #{endDate} >= start_time
-  </select>
+  <update id="setActivityStatus" parameterType="java.lang.Long">
+    update deal_activity
+    set activity_status=0
+    where id = #{id,jdbcType=BIGINT}
+    and activity_status=1
+  </update>
 
-  <select id="queryActivitiesByEndTime"  resultMap="BaseResultMap">
-    SELECT
-    <include refid="Base_Column_List"/>
-    FROM deal_activity
+
+  <update id="closeExpiredActivities">
+    UPDATE deal_activity
+    SET activity_status=0
     WHERE #{nowDate} >= end_time
-  </select>
+    AND activity_status=1
+  </update>
 
 </mapper>

@@ -2,17 +2,15 @@ package com.example.trade.lightningdeal.service;
 
 
 import com.alibaba.fastjson.JSON;
-import com.example.trade.common.model.Goods;
 import com.example.trade.common.utils.RedisWorker;
-import com.example.trade.lightningdeal.client.GoodsFeignClient;
 import com.example.trade.lightningdeal.db.dao.DealActivityDao;
 import com.example.trade.lightningdeal.db.model.DealActivity;
+import com.example.trade.lightningdeal.mq.DealOrderMessageSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,9 +23,8 @@ public class AutoCacheService {
     DealActivityDao dealActivityDao;
     @Autowired
     RedisWorker redisWorker;
-
     @Autowired
-    GoodsFeignClient goodsFeignClient;
+    DealOrderMessageSender dealOrderMessageSender;
     @Scheduled(fixedRate = 120000)
     public void updateRedisCache(){
         log.info("AntoCache Management Running");
@@ -41,6 +38,10 @@ public class AutoCacheService {
             DealActivity expiredDeal=JSON.parseObject(redisWorker.getValueByKey(key), DealActivity.class);
             log.info("deal {}'s end time is {}",expiredDeal.getId(),expiredDeal.getEndTime().toString());
             if(expiredDeal.getEndTime().before(new Date())){
+                if(dealActivityDao.updateDealActivityStatus(expiredDeal.getId())) {
+                    int restStock = expiredDeal.getAvailableStock() + expiredDeal.getLockStock();
+                    dealOrderMessageSender.sendActivityExpirationMessage(expiredDeal.getGoodsId() + ":" + restStock);
+                }
                 redisWorker.removeKey(key);
                 redisWorker.removeKey("dealActivity_goods:" + expiredDeal.getGoodsId());
                 log.info("Remove deal {} activity from cache",expiredDeal.getId());
@@ -49,12 +50,7 @@ public class AutoCacheService {
 
         List<DealActivity> nextActivities=dealActivityDao.queryActivitiesByStartTime(nowTime,nextcheckTime);
         for(DealActivity dealActivity:nextActivities) {
-            Goods goods = goodsFeignClient.queryGoodsById(dealActivity.getGoodsId());
-            if(goods!=null) {
-                redisWorker.setValue("dealActivity:" + dealActivity.getId(), JSON.toJSONString(dealActivity));
-                redisWorker.setValue("dealActivity_goods:" + dealActivity.getGoodsId(), JSON.toJSONString(goods));
-                log.info("Add deal activity to cache,key:{}","dealActivity:" + dealActivity.getId());
-            }
+            dealOrderMessageSender.sendDealCacheMessage(JSON.toJSONString(dealActivity));
         }
     }
 }

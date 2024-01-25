@@ -48,4 +48,22 @@ public class GoodsDaoImplement implements GoodsDao {
         int result=goodsMapper.revertStock(id);
         return result>0;
     }
+
+    @Override
+    public boolean lockStock(long id,int num){
+        int result=goodsMapper.lockStockMulti(id,num);
+        return result>0;
+    }
+
+    @Override
+    public boolean deductStock(long id,int num){
+        int result=goodsMapper.deductStockMulti(id,num);
+        return result>0;
+    }
+
+    @Override
+    public boolean revertStock(long id,int num){
+        int result=goodsMapper.revertStockMulti(id,num);
+        return result>0;
+    }
 }
