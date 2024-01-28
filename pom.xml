@@ -20,6 +20,7 @@
 	<modules>
 		<module>trade-goods</module>
 		<module>trade-order</module>
+		<module>trade-user</module>
 		<module>trade-web-manager</module>
 		<module>trade-web-portal</module>
 		<module>trade-lightning-deal</module>
@@ -49,6 +50,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
 		</dependency>
 
 	</dependencies>

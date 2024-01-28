@@ -80,4 +80,13 @@ public class UserController {
         }
 
     }
+    @RequestMapping("/user/logout/Action")
+    public ResponseEntity<?> userLogout(HttpSession session){
+        if(session.getAttribute("userId")!=null) {
+            session.invalidate();
+            return ResponseEntity.ok("User logout");
+        }
+        else
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User didn't login, nothing happened");
+    }
 }

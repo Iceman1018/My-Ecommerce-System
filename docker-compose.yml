@@ -24,24 +24,6 @@ services:
     volumes:
       - redis-data:/data
 
-  redis-cache:
-    image: redis
-    ports:
-      - "6380:6379"
-    volumes:
-      - redis-cache-data:/data
-    command:
-      - some-redis --maxmemory 100mb --maxmemory-policy allkeys-lfu
-
-  redis-universal:
-    image: redis
-    ports:
-      - "6381:6379"
-    volumes:
-      - redis-universal-data:/data
-    command:
-      - some-redis --maxmemory 100mb --maxmemory-policy allkeys-lru
-
 
   consul:
     image: consul:1.13.2

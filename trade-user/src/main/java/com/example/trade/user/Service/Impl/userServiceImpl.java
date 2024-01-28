@@ -60,6 +60,8 @@ public class userServiceImpl implements UserService{
     @Override
     public Long UserLogin(String email, String password){
         User user=userDao.queryUserByEmail(email);
+        if(user==null)
+            return null;
         if(bCryptPasswordEncoder.matches(password,user.getLoginPassword())) {
             log.info("Login Successfully");
             return user.getId();

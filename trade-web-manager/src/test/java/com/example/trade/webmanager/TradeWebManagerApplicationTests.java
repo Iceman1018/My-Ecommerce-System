@@ -50,8 +50,8 @@ class TradeWebManagerApplicationTests {
             dealActivity.setActivityName("Black Friday");
             dealActivity.setGoodsId(new Long(21));
 
-            String startTime = "2024-01-25 0:00:00";
-            String endTime = "2024-01-25 18:45:00";
+            String startTime = "2024-01-28 0:00:00";
+            String endTime = "2024-01-28 18:45:00";
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             dealActivity.setStartTime(format.parse(startTime));
             dealActivity.setEndTime(format.parse(endTime));
