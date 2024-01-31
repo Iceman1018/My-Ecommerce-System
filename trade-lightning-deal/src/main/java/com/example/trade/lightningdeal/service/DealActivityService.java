@@ -12,11 +12,11 @@ public interface DealActivityService {
     DealActivity queryDealActivityById(long id);
     List<DealActivity> queryActivitysByStatus(int status);
 
-    Order processDeal(long userId, long dealActivityId);
-    boolean lockStock(long id);
+    Order processDeal(long userId, long dealActivityId, int num);
+    boolean lockStock(long id,int num);
 
-    boolean deductStock(long id);
-    boolean revertStock(long id);
+    boolean deductStock(long id,int num);
+    boolean revertStock(long id,int num);
 
 
 }

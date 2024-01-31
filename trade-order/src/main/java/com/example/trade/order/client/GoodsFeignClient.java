@@ -13,13 +13,13 @@ public interface GoodsFeignClient {
     Goods queryGoodsById(@RequestParam("id") long id);
 
     @RequestMapping("/api/goods/lockStock")
-    boolean lockStock(@RequestParam("id") long id);
+    boolean lockStock(@RequestParam("id") long id, @RequestParam("num") int num);
 
     @RequestMapping("/api/goods/deductStock")
-    boolean deductStock(@RequestParam("id") long id);
+    boolean deductStock(@RequestParam("id") long id, @RequestParam("num") int num);
 
     @RequestMapping("/api/goods/revertStock")
-    boolean revertStock(@RequestParam("id") long id);
+    boolean revertStock(@RequestParam("id") long id, @RequestParam("num") int num);
 
     @RequestMapping("/api/goods/searchGoodsList")
     List<Goods> searchGoodsList(@RequestParam("keyword") String keyword, @RequestParam("from") int from, @RequestParam("size") int size);

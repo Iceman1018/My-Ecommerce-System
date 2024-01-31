@@ -20,10 +20,10 @@ public class OrderAPI {
 
     @GetMapping("/api/order/createOrder")
     @ResponseBody
-    public Order createOrder(long userId, long goodsId) {
+    public Order createOrder(long userId, long goodsId,int goodsNum) {
         try {
             log.info("createOrder userId:{} goodsId:{}", userId, goodsId);
-            return orderService.createOrder(userId, goodsId);
+            return orderService.createOrder(userId, goodsId, goodsNum);
         }catch (Exception e) {
             log.error(e.getMessage());
             return null;

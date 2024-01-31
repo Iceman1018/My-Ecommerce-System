@@ -1,8 +1,8 @@
 package com.example.trade.webmanager.controller;
+import com.example.trade.common.model.DealActivity;
+import com.example.trade.common.model.Goods;
 import com.example.trade.webmanager.client.DealFeignClient;
 import com.example.trade.webmanager.client.GoodsFeignClient;
-import com.example.trade.webmanager.client.model.DealActivity;
-import com.example.trade.webmanager.client.model.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,6 +60,7 @@ public class ManagerController {
     @RequestMapping("/admin/addDealActivityAction")
     public ResponseEntity<?> addDealActivityAction(@RequestParam("activityName") String activityName,
                                                     @RequestParam("goodsId") long goodsId,
+                                                    @RequestParam("limitPerUser") int limitPerUser,
                                                     @RequestParam("startTime") String startTime,
                                                     @RequestParam("endTime") String endTime,
                                                     @RequestParam("availableStock") int availableStock,
@@ -69,7 +70,7 @@ public class ManagerController {
             DealActivity dealActivity = new DealActivity();
             dealActivity.setActivityName(activityName);
             dealActivity.setGoodsId(goodsId);
-
+            dealActivity.setLimitPerUser(limitPerUser);
             startTime=startTime.substring(0,10)+" "+startTime.substring(11);
             endTime=endTime.substring(0,10)+" "+endTime.substring(11);
             SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd hh:mm");

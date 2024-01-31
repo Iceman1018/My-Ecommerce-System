@@ -1,6 +1,6 @@
 package com.example.trade.web.portal.client;
 
-import com.example.trade.web.portal.client.model.Goods;
+import com.example.trade.common.model.Goods;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

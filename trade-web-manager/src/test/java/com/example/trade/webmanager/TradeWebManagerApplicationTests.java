@@ -1,9 +1,9 @@
 package com.example.trade.webmanager;
 
+import com.example.trade.common.model.DealActivity;
+import com.example.trade.common.model.Goods;
 import com.example.trade.webmanager.client.DealFeignClient;
 import com.example.trade.webmanager.client.GoodsFeignClient;
-import com.example.trade.webmanager.client.model.DealActivity;
-import com.example.trade.webmanager.client.model.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +47,15 @@ class TradeWebManagerApplicationTests {
     void addDealTest() {
         try {
             DealActivity dealActivity = new DealActivity();
-            dealActivity.setActivityName("Black Friday");
-            dealActivity.setGoodsId(new Long(21));
+            dealActivity.setActivityName("Black Friday2");
+            dealActivity.setGoodsId(new Long(16));
+            dealActivity.setLimitPerUser(5);
 
-            String startTime = "2024-01-28 0:00:00";
-            String endTime = "2024-01-28 18:45:00";
+            String startTime = "2024-01-30 0:00:00";
+            String endTime = "2024-01-30 18:45:00";
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             dealActivity.setStartTime(format.parse(startTime));
+
             dealActivity.setEndTime(format.parse(endTime));
             dealActivity.setAvailableStock(50);
 

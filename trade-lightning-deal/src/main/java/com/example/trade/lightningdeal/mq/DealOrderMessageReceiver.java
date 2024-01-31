@@ -28,7 +28,7 @@ public class DealOrderMessageReceiver {
         log.info("deal order pay finished, got the message:{}", message);
         Order order = JSON.parseObject(message, Order.class);
         //扣减库存
-        dealActivityService.deductStock(order.getActivityId());
+        dealActivityService.deductStock(order.getActivityId(),order.getGoodsNum());
     }
 
     /**
@@ -40,10 +40,10 @@ public class DealOrderMessageReceiver {
     public void process2(String message) {
         log.info("Deal order pay unfinished,got the message:{}", message);
         Order order = JSON.parseObject(message, Order.class);
-        redisWorker.removeLimitMember(order.getActivityId(), order.getUserId());
-        redisWorker.stockRevert(order.getActivityId());
+        redisWorker.removeLimit(order.getActivityId(), order.getUserId(),order.getGoodsNum());
+        redisWorker.stockRevert(order.getActivityId(), order.getGoodsNum());
         //秒杀库存回补
-        dealActivityService.revertStock(order.getActivityId());
+        dealActivityService.revertStock(order.getActivityId(),order.getGoodsNum());
 
     }
 }

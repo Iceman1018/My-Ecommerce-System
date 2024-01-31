@@ -63,6 +63,25 @@ public class RedisWorker {
         jedisClient.close();
     }
 
+    public void addItemToSet(String key,String item){
+        Jedis jedisClient = jedisPool.getResource();
+        jedisClient.sadd(key,item);
+        jedisClient.close();
+    }
+
+    public void removeItemFromSet(String key,String item){
+        Jedis jedisClient = jedisPool.getResource();
+        jedisClient.srem(key,item);
+        jedisClient.close();
+    }
+
+    public boolean isItemInSet(String key,String item){
+        Jedis jedisClient = jedisPool.getResource();
+        boolean res = jedisClient.sismember(key, item);
+        jedisClient.close();
+        return res;
+    }
+
     public List<String> findKeys(String prefix){
         List<String> res=new LinkedList<>();
         Jedis jedisClient = jedisPool.getResource();
@@ -89,31 +108,26 @@ public class RedisWorker {
     /**
      * 通过Redis中Lua，判断库存和对库存进行扣减
      *
-     * @param key
+     * @param
      * @return
      */
-    public boolean stockDeductCheck(String key) {
+    public boolean stockDeductCheck(long dealActivityId,int num) {
+        String key = "stock:" + dealActivityId;
         Jedis jedisClient = null;
         try {
             jedisClient = jedisPool.getResource();
 
             String script = "if redis.call('exists',KEYS[1]) == 1 then\n" +
                     "                 local availableStock = tonumber(redis.call('get', KEYS[1]))\n" +
-                    "                 if( availableStock <=0 ) then\n" +
+                    "                 local num = tonumber(ARGV[1])\n"+
+                    "                 if( availableStock < num ) then\n" +
                     "                    return -1\n" +
                     "                 end;\n" +
-                    "                 redis.call('decr',KEYS[1]);\n" +
-                    "                 return availableStock - 1;\n" +
+                    "                 redis.call('decrBy',KEYS[1],num);\n" +
+                    "                 return availableStock - num;\n" +
                     "             end;\n" +
                     "             return -1;";
-
-            /*
-             * 执行脚本
-             * redis自从2.6.0版本起就采用内置的Lua解释器通过EVAL命令去执行脚本
-             */
-            long scriptResult = (Long) jedisClient.eval(script,
-                    Collections.singletonList(key),
-                    Collections.emptyList());
+            long scriptResult = (Long) jedisClient.eval(script,1,key,String.valueOf(num));
 
             if (scriptResult < 0) {
                 log.info("很遗憾，库存不足,抢购失败");
@@ -132,38 +146,73 @@ public class RedisWorker {
         }
     }
 
-    public void stockRevert(Long dealActivityId){
+    public void stockRevert(long dealActivityId,int num){
         Jedis jedisClient = jedisPool.getResource();
-        jedisClient.incr("stock:"+dealActivityId);
+        jedisClient.incrBy("stock:"+dealActivityId,num);
         jedisClient.close();
     }
-    public void addLimitMember(long dealActivityId, long userId) {
+    public boolean addLimit(long dealActivityId, long userId, int num,int limitNum) {
         Jedis jedisClient = jedisPool.getResource();
-        jedisClient.sadd("deal_activity_members:" + dealActivityId, String.valueOf(userId));
-        jedisClient.close();
-        log.info("添加限制购买名单 userId:{}  dealActivityId:{}  ", userId, dealActivityId);
+        try{
+            String key = "deal_activity_members:" + dealActivityId;
+            String luaScript =
+                    "local key = KEYS[1]\n" +
+                            "local userId = ARGV[1]\n" +
+                            "local num = tonumber(ARGV[2])\n" +
+                            "local limitNum = tonumber(ARGV[3])\n" +
+                            "local currentValue = redis.call('hget', key, userId)\n" +
+                            "\n" +
+                            "if currentValue == false then\n" +
+                            "    if num > limitNum then\n" +
+                            "        return false\n" +
+                            "    end\n" +
+                            "    redis.call('hset', key, userId, tostring(num))\n" +
+                            "    --redis.log(redis.LOG_NOTICE,\"success!\")\n"+
+                            "else\n" +
+                            "    currentValue = tonumber(currentValue)\n" +
+                            "    if currentValue + num > limitNum then\n" +
+                            "        --redis.log(redis.LOG_NOTICE,\"false!\")\n"+
+                            "        return false\n" +
+                            "    end\n" +
+                            "    redis.call('hset', key, userId, tostring(currentValue + num))\n" +
+                            "    --redis.log(redis.LOG_NOTICE,\"success!\")\n"+
+                            "end\n" +
+                            "--redis.log(redis.LOG_NOTICE,\"finally success!\")\n"+
+                            "return true";
+
+            long result = (long)jedisClient.eval(luaScript, 1, key, String.valueOf(userId), String.valueOf(num), String.valueOf(limitNum));
+            log.info("redis有这些值:{}",jedisClient.hgetAll(key));
+            log.info("增加限购记录是否成功:{}, userId:{}, dealId:{}",result==1,userId,dealActivityId);
+            return result==1;
+        }catch (Exception e){
+            log.error("限购异常:{}", e.getMessage());
+            return false;
+        }finally {
+            jedisClient.close();
+        }
     }
 
-    /**
-     * 移除限制购买的名单
-     * redis srem 命令用于移除集合中的一个或多个成员元素，不存在的成员元素会被忽略
-     *
-     * @param dealActivityId
-     * @param userId
-     */
-    public void removeLimitMember(long dealActivityId, long userId) {
+    public void removeLimit(long dealActivityId, long userId,int num) {
         Jedis jedisClient = jedisPool.getResource();
-        jedisClient.srem("deal_activity_members:" + dealActivityId, String.valueOf(userId));
-        jedisClient.close();
-        log.info("移除限制购买名单 userId:{}  dealActivityId:{}  ", userId, dealActivityId);
-    }
-
-    public boolean isInLimitMember(long dealActivityId,long userId){
-        Jedis jedisClient=jedisPool.getResource();
-        boolean sismember=jedisClient.sismember("deal_activity_members:"+dealActivityId,String.valueOf(userId));
-        jedisClient.close();
-        log.info("Whether the member is in the purchase limitation list:{} userId:{} dealActivityId:{}",sismember,userId,dealActivityId);
-        return sismember;
+        try{
+            String key="deal_activity_members:" + dealActivityId;
+            String luaScript=
+                    "local key = KEYS[1]\n"+
+                            "local userId = ARGV[1]\n"+
+                            "local num = tonumber(ARGV[2])\n"+
+                            "local currentValue = redis.call('hget', key, userId)\n"+
+                            "if currentValue ~= false then\n"+
+                            "    currentValue = tonumber(currentValue)\n"+
+                            "    local newValue = currentValue >= num and (currentValue - num) or 0\n"+
+                            "    redis.call('hset', key, userId, tostring(newValue))\n"+
+                            "end";
+            jedisClient.eval(luaScript,1,key,String.valueOf(userId),String.valueOf(num));
+        }catch (Exception e){
+            log.error("回退限购失败");
+        }finally {
+            jedisClient.close();
+            log.info("增加用户购买额度 userId:{}  dealActivityId:{}  ", userId, dealActivityId);
+        }
     }
 
 }

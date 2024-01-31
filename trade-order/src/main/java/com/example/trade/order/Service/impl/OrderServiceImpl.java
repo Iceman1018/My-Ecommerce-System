@@ -5,7 +5,7 @@ import com.example.trade.common.model.Goods;
 import com.example.trade.common.utils.SnowflakeIdWorker;
 import com.example.trade.order.Service.OrderService;
 import com.example.trade.order.client.GoodsFeignClient;
-import com.example.trade.order.db.dao.OrderDao;
+import com.example.trade.order.db.dao.OrderRepository;
 import com.example.trade.order.db.model.Order;
 import com.example.trade.order.mq.OrderMessageSender;
 import lombok.extern.slf4j.Slf4j;
@@ -19,16 +19,15 @@ import java.util.List;
 @Service
 public class OrderServiceImpl implements OrderService {
     @Autowired
-    OrderDao orderDao;
+    OrderRepository orderDao;
     @Autowired
     GoodsFeignClient goodsService;
-
 
     @Autowired
     private OrderMessageSender orderMessageSender;
     private SnowflakeIdWorker snowflakeIdWorker=new SnowflakeIdWorker(6,8);
     @Override
-    public Order createOrder(long userId, long goodsId){
+    public Order createOrder(long userId, long goodsId,int goodsNum){
         Goods goods=goodsService.queryGoodsById(goodsId);
         if(goods==null){
             log.error("goods is null goodsId={}",goodsId);
@@ -38,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
             log.error("goods stock not enough, goodsId={},userId={}",goodsId,userId);
             throw new RuntimeException("goods stock not enough");
         }
-        boolean lockResult=goodsService.lockStock(goodsId);
+        boolean lockResult=goodsService.lockStock(goodsId,goodsNum);
         if(!lockResult){
             log.error("order lock stock error goods={}",JSON.toJSONString(goods));
             throw new RuntimeException("order stock lock failed");
@@ -49,10 +48,11 @@ public class OrderServiceImpl implements OrderService {
         order.setActivityId(0L);
         order.setActivityType(0);
         order.setGoodsId(goodsId);
+        order.setGoodsNum(goodsNum);
         order.setUserId(userId);
         order.setStatus(1);
         order.setCreateTime(new Date());
-        order.setPayPrice(goods.getPrice());
+        order.setPayPrice(goods.getPrice()*goodsNum);
 //        boolean res=orderDao.insertOrder(order);
 //        if(!res){
 //            log.error("order insert error order={}", JSON.toJSONString(order));
@@ -65,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
     }
     @Override
     public Order queryOrder(long OrderId) {
-        return orderDao.queryOrderById(OrderId);
+        return orderDao.findById(OrderId).orElse(null);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void payOrder(long orderId){
         log.info("Pay for the order: {}",orderId);
-        Order order=orderDao.queryOrderById(orderId);
+        Order order=orderDao.findById(orderId).orElse(null);
         if(order==null){
             log.error("orderId={} order didn't exist",orderId );
             throw new RuntimeException("Order didn't exist");
@@ -90,17 +90,12 @@ public class OrderServiceImpl implements OrderService {
         log.info("payment simulation");
         order.setPayTime(new Date());
         order.setStatus(2);
-        boolean updateResult=orderDao.updateOrder(order);
-        if(!updateResult){
-            log.error("orderId={} payment status update failed",orderId);
-            throw new RuntimeException("payment status update failed");
-        }
-        boolean deductResult= goodsService.deductStock(order.getGoodsId());
+        boolean deductResult= goodsService.deductStock(order.getGoodsId(), order.getGoodsNum());
         if(!deductResult){
             log.error("orderId={} deduct stock failed",orderId);
             throw new RuntimeException("deduct stock failed");
         }
-        orderDao.updateOrder(order);
+        orderDao.save(order);
         if(order.getActivityType()==1)
             orderMessageSender.sendSecPaySuccessMessage(JSON.toJSONString(order));
     }

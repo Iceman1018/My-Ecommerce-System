@@ -1,8 +1,12 @@
 package com.example.trade.web.portal.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.example.trade.common.model.CartItem;
+import com.example.trade.common.model.Goods;
+import com.example.trade.common.model.User;
 import com.example.trade.common.utils.RedisWorker;
 import com.example.trade.web.portal.client.UserFeignClient;
-import com.example.trade.web.portal.client.model.User;
+import com.example.trade.web.portal.mq.CartPersistentSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,12 +16,12 @@ import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.session.data.redis.RedisSessionRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -26,7 +30,10 @@ public class UserController {
     @Autowired
     private UserFeignClient userService;
     @Autowired
-    private RedisIndexedSessionRepository redisIndexedSessionRepository;
+    private CartPersistentSender cartPersistentSender;
+
+    @Autowired
+    private RedisWorker redisWorker;
 
     @RequestMapping("user/{userId}")
     public ResponseEntity<?> userInfo(HttpSession session, @PathVariable long userId){
@@ -48,10 +55,14 @@ public class UserController {
     public ResponseEntity<?> userLogin(HttpSession session,
                                        @RequestParam("userEmail") String userEmail,
                                        @RequestParam("userPassword") String userPassword){
-        Long res=userService.UserLogin(userEmail,userPassword);
+        User res=userService.UserLogin(userEmail,userPassword);
         if(res!=null) {
-            session.setAttribute("userId",res);
-            return ResponseEntity.ok(session.getAttribute("userId"));
+            session.setAttribute("userId",res.getId());
+            Map<Long,CartItem>map=new HashMap<>();
+            for(CartItem cartItem:res.getCartItems())
+                map.put(cartItem.getId(), cartItem);
+            session.setAttribute("userCart",map);
+            return ResponseEntity.ok(res);
         }
         else
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email and Password didn't match");
@@ -89,4 +100,5 @@ public class UserController {
         else
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User didn't login, nothing happened");
     }
+
 }

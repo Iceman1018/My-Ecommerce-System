@@ -1,4 +1,4 @@
-package com.example.trade.web.portal.client.model;
+package com.example.trade.common.model;
 
 import java.util.Date;
 
@@ -8,6 +8,8 @@ public class DealActivity {
     private String activityName;
 
     private Long goodsId;
+
+    private Integer limitPerUser;
 
     private Date startTime;
 
@@ -47,6 +49,14 @@ public class DealActivity {
 
     public void setGoodsId(Long goodsId) {
         this.goodsId = goodsId;
+    }
+
+    public Integer getLimitPerUser() {
+        return limitPerUser;
+    }
+
+    public void setLimitPerUser(Integer limitPerUser) {
+        this.limitPerUser = limitPerUser;
     }
 
     public Date getStartTime() {

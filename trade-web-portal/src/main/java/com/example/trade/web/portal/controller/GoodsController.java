@@ -2,8 +2,8 @@ package com.example.trade.web.portal.controller;
 
 
 
+import com.example.trade.common.model.Goods;
 import com.example.trade.web.portal.client.GoodsFeignClient;
-import com.example.trade.web.portal.client.model.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

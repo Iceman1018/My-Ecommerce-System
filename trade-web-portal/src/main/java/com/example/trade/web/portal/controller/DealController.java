@@ -1,20 +1,21 @@
 package com.example.trade.web.portal.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.example.trade.common.model.DealActivity;
+import com.example.trade.common.model.Goods;
+import com.example.trade.common.model.Order;
 import com.example.trade.common.model.TradeResultDTO;
 import com.example.trade.common.utils.RedisWorker;
 import com.example.trade.web.portal.client.DealFeignClient;
 import com.example.trade.web.portal.client.GoodsFeignClient;
 import com.example.trade.web.portal.client.OrderFeignClient;
-import com.example.trade.web.portal.client.model.DealActivity;
-import com.example.trade.web.portal.client.model.Goods;
-import com.example.trade.web.portal.client.model.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -89,13 +90,14 @@ public class DealController {
     }
     @RequestMapping("/deal/buy/{dealId}")
     public ResponseEntity<?> dealBuy(HttpSession session,
-                                        @PathVariable long dealId) {
+                                     @PathVariable long dealId,
+                                     @RequestParam("num") int num) {
         if(session.getAttribute("userId")==null){
             log.error("You haven't logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
         }
         Long userId=((Number)session.getAttribute("userId")).longValue();
-        TradeResultDTO<Order> res = dealActivityService.processDeal(userId, dealId);
+        TradeResultDTO<Order> res = dealActivityService.processDeal(userId, dealId,num);
         if(res.getCode()!=200){
             log.error(res.getErrorMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res.getErrorMessage());

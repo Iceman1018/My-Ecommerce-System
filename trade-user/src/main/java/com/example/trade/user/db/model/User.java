@@ -1,53 +1,32 @@
 package com.example.trade.user.db.model;
 
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.util.Set;
+
+@Getter
+@Setter
+@Entity
+@Table(name="user_info")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="userName")
     private String userName;
-
+    @Column(name="loginEmail")
     private String loginEmail;
-
+    @Column(name="loginPassword")
     private String loginPassword;
-
+    @Column(name="tags")
     private String tags;
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private Set<CartItem> cartItems;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName == null ? null : userName.trim();
-    }
-
-    public String getLoginEmail() {
-        return loginEmail;
-    }
-
-    public void setLoginEmail(String loginEmail) {
-        this.loginEmail = loginEmail == null ? null : loginEmail.trim();
-    }
-
-    public String getLoginPassword() {
-        return loginPassword;
-    }
-
-    public void setLoginPassword(String loginPassword) {
-        this.loginPassword = loginPassword == null ? null : loginPassword.trim();
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags == null ? null : tags.trim();
-    }
+    public User(){}
 }

@@ -1,14 +1,15 @@
 package com.example.trade.web.portal.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.example.trade.common.model.Order;
 import com.example.trade.web.portal.client.OrderFeignClient;
-import com.example.trade.web.portal.client.model.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -53,20 +54,21 @@ public class OrderController {
         }
         if(orderService.payOrder(orderId)) {
             log.info("Pay successfully");
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("pay successfully!");
         } else{
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("pay failed");
         }
     }
     @RequestMapping("/order/create/{goodsId}")
-    public ResponseEntity<?> buy(HttpSession session,@PathVariable long goodsId){
+    public ResponseEntity<?> buy(HttpSession session,@PathVariable("goodsId") long goodsId,
+                                 @RequestParam("goodsNum") long goodsNum){
         if(session.getAttribute("userId")==null){
             log.error("You haven't logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
         }
         Long userId=((Number)session.getAttribute("userId")).longValue();
         log.info("userId={},goodsId={}",userId,goodsId);
-        Order order = orderService.createOrder(userId, goodsId);
+        Order order = orderService.createOrder(userId, goodsId, goodsNum);
         if(order!=null) {
             log.info("Order created!");
             return ResponseEntity.ok(order);

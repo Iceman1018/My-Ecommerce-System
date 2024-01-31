@@ -74,9 +74,9 @@ public class GoodsAPI {
      */
     @GetMapping("/api/goods/lockStock")
     @ResponseBody
-    public boolean lockStock(long id) {
+    public boolean lockStock(long id,int num) {
         log.info("lockStock id:{}", id);
-        return goodsService.lockStock(id);
+        return goodsService.lockStock(id,num);
     }
 
     /**
@@ -87,9 +87,9 @@ public class GoodsAPI {
      */
     @GetMapping("/api/goods/deductStock")
     @ResponseBody
-    public boolean deductStock(long id) {
+    public boolean deductStock(long id,int num) {
         log.info("deductStock id:{}", id);
-        return goodsService.deductStock(id);
+        return goodsService.deductStock(id,num);
     }
 
     /**
@@ -100,8 +100,8 @@ public class GoodsAPI {
      */
     @GetMapping("/api/goods/revertStock")
     @ResponseBody
-    public boolean revertStock(long id) {
+    public boolean revertStock(long id,int num) {
         log.info("revertStock id:{}", id);
-        return goodsService.revertStock(id);
+        return goodsService.revertStock(id,num);
     }
 }

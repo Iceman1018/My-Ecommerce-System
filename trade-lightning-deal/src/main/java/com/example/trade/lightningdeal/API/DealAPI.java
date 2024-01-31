@@ -62,11 +62,11 @@ public class DealAPI {
      */
     @GetMapping("/api/deal/processDeal")
     @ResponseBody
-    public TradeResultDTO<Order> processDeal(long userId, long dealActivityId) {
+    public TradeResultDTO<Order> processDeal(long userId, long dealActivityId, int num) {
         TradeResultDTO<Order> res = new TradeResultDTO<>();
         try {
             log.info("processDeal userId:{} dealActivityId:{}", userId, dealActivityId);
-            Order order = dealActivityService.processDeal(userId, dealActivityId);
+            Order order = dealActivityService.processDeal(userId, dealActivityId, num);
             res.setData(order);
             res.setCode(200);
         } catch (Exception ex) {
@@ -85,9 +85,9 @@ public class DealAPI {
      */
     @GetMapping("/api/deal/lockStock")
     @ResponseBody
-    public boolean lockStock(long id) {
+    public boolean lockStock(long id, int num) {
         log.info("lockStock id:{}", id);
-        return dealActivityService.lockStock(id);
+        return dealActivityService.lockStock(id,num);
     }
 
     /**
@@ -98,9 +98,9 @@ public class DealAPI {
      */
     @GetMapping("/api/deal/deductStock")
     @ResponseBody
-    public boolean deductStock(long id) {
+    public boolean deductStock(long id, int num) {
         log.info("deductStock id:{}", id);
-        return dealActivityService.deductStock(id);
+        return dealActivityService.deductStock(id,num);
     }
 
     /**
@@ -111,17 +111,12 @@ public class DealAPI {
      */
     @GetMapping("/api/deal/revertStock")
     @ResponseBody
-    public boolean revertStock(long id) {
+    public boolean revertStock(long id,int num) {
         log.info("revertStock id:{}", id);
-        return dealActivityService.revertStock(id);
+        return dealActivityService.revertStock(id,num);
     }
 
-    /**
-     * 缓存预热
-     * 将秒杀信息写入Redis中
-     *
-     * @param id
-     */
+
 
 }
 

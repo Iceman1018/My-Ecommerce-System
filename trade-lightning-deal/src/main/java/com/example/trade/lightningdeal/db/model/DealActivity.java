@@ -1,30 +1,37 @@
 package com.example.trade.lightningdeal.db.model;
 
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name="deal_activity")
 public class DealActivity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="activity_name")
     private String activityName;
-
+    @Column(name = "goods_id")
     private Long goodsId;
-
+    @Column(name="limit_per_user")
+    private Integer limitPerUser;
+    @Column(name = "start_time")
     private Date startTime;
-
+    @Column(name="end_time")
     private Date endTime;
-
+    @Column(name="available_stock")
     private Integer availableStock;
-
+    @Column(name="lock_stock")
     private Integer lockStock;
-
+    @Column(name="activity_status")
     private Integer activityStatus;
-
+    @Column(name="deal_price")
     private Integer dealPrice;
-
+    @Column(name="old_price")
     private Integer oldPrice;
-
+    @Column(name="create_time")
     private Date createTime;
-
     public Long getId() {
         return id;
     }
@@ -48,6 +55,10 @@ public class DealActivity {
     public void setGoodsId(Long goodsId) {
         this.goodsId = goodsId;
     }
+
+    public Integer getLimitPerUser(){return limitPerUser;}
+
+    public void setLimitPerUser(Integer limitPerUser){this.limitPerUser=limitPerUser;}
 
     public Date getStartTime() {
         return startTime;

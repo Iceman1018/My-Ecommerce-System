@@ -1,10 +1,10 @@
 package com.example.trade.web.portal.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.example.trade.common.model.DealActivity;
+import com.example.trade.common.model.Goods;
 import com.example.trade.common.utils.RedisWorker;
 import com.example.trade.web.portal.client.GoodsFeignClient;
-import com.example.trade.web.portal.client.model.DealActivity;
-import com.example.trade.web.portal.client.model.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;

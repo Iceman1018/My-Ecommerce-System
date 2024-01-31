@@ -7,12 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 
 @Slf4j
@@ -31,7 +33,7 @@ public class UserAPI {
 
     @GetMapping("/api/user/login")
     @ResponseBody
-    public Long UserLogin(@RequestParam("email") String email, @RequestParam("password") String password){
+    public User UserLogin(@RequestParam("email") String email, @RequestParam("password") String password){
         log.info("userLogin email:{}",email);
         return userService.UserLogin(email,password);
     }

@@ -7,6 +7,8 @@ public class Order {
 
     private Long goodsId;
 
+    private Integer goodsNum;
+
     private Integer payPrice;
 
     private Long userId;
@@ -35,6 +37,14 @@ public class Order {
 
     public void setGoodsId(Long goodsId) {
         this.goodsId = goodsId;
+    }
+
+    public Integer getGoodsNum() {
+        return goodsNum;
+    }
+
+    public void setGoodsNum(Integer goodsNum) {
+        this.goodsNum = goodsNum;
     }
 
     public Integer getPayPrice() {

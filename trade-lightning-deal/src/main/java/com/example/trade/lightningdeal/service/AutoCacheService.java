@@ -3,8 +3,9 @@ package com.example.trade.lightningdeal.service;
 
 import com.alibaba.fastjson.JSON;
 import com.example.trade.common.utils.RedisWorker;
-import com.example.trade.lightningdeal.db.dao.DealActivityDao;
+import com.example.trade.lightningdeal.db.dao.DealActivityRepository;
 import com.example.trade.lightningdeal.db.model.DealActivity;
+import com.example.trade.lightningdeal.mq.CartItemExpirationMessageSender;
 import com.example.trade.lightningdeal.mq.DealOrderMessageSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,14 @@ import java.util.List;
 @Slf4j
 public class AutoCacheService {
     @Autowired
-    DealActivityDao dealActivityDao;
+    DealActivityRepository dealActivityDao;
     @Autowired
     RedisWorker redisWorker;
     @Autowired
     DealOrderMessageSender dealOrderMessageSender;
+
+    @Autowired
+    CartItemExpirationMessageSender cartItemExpirationMessageSender;
     @Scheduled(fixedRate = 120000)
     public void updateRedisCache(){
         log.info("AntoCache Management Running");
@@ -38,9 +42,10 @@ public class AutoCacheService {
             DealActivity expiredDeal=JSON.parseObject(redisWorker.getValueByKey(key), DealActivity.class);
             log.info("deal {}'s end time is {}",expiredDeal.getId(),expiredDeal.getEndTime().toString());
             if(expiredDeal.getEndTime().before(new Date())){
-                if(dealActivityDao.updateDealActivityStatus(expiredDeal.getId())) {
+                if(dealActivityDao.updateDealActivityStatus(expiredDeal.getId())>0) {
                     int restStock = expiredDeal.getAvailableStock() + expiredDeal.getLockStock();
                     dealOrderMessageSender.sendActivityExpirationMessage(expiredDeal.getGoodsId() + ":" + restStock);
+                    cartItemExpirationMessageSender.sendCartItemExpirationMessage(String.valueOf(expiredDeal.getId()));
                 }
                 redisWorker.removeKey(key);
                 redisWorker.removeKey("dealActivity_goods:" + expiredDeal.getGoodsId());

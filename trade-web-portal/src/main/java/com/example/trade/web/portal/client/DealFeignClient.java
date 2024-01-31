@@ -1,8 +1,8 @@
 package com.example.trade.web.portal.client;
 
+import com.example.trade.common.model.DealActivity;
+import com.example.trade.common.model.Order;
 import com.example.trade.common.model.TradeResultDTO;
-import com.example.trade.web.portal.client.model.DealActivity;
-import com.example.trade.web.portal.client.model.Order;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,7 +17,9 @@ public interface DealFeignClient {
     @RequestMapping("/api/deal/queryActivitysByStatus")
     List<DealActivity> queryActivitysByStatus(@RequestParam("status") int status);
     @RequestMapping("/api/deal/processDeal")
-    TradeResultDTO<Order> processDeal(@RequestParam("userId") long userId, @RequestParam("dealActivityId") long dealActivityId);
+    TradeResultDTO<Order> processDeal(@RequestParam("userId") long userId,
+                                      @RequestParam("dealActivityId") long dealActivityId,
+                                      @RequestParam("num") int num);
 
 
 }

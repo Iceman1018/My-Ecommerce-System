@@ -2,8 +2,8 @@ package com.example.trade.goods;
 
 import com.alibaba.fastjson.JSON;
 import com.example.trade.goods.db.dao.GoodsDao;
-import com.example.trade.goods.db.mappers.GoodsMapper;
 import com.example.trade.goods.db.model.Goods;
+import com.example.trade.goods.service.GoodsService;
 import com.example.trade.goods.service.SearchService;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -21,7 +21,7 @@ import java.util.List;
 @SpringBootTest
 public class GoodsTest {
     @Autowired
-    private GoodsDao goodsDao;
+    private GoodsService goodsService;
     @Autowired
     private SearchService searchService;
 
@@ -39,17 +39,18 @@ public class GoodsTest {
         goods.setImage("test");
         goods.setDescription("newest apple phone");
         goods.setKeywords("Apple phone");
+        goods.setLockStock(0);
         goods.setSaleNum(0);
         goods.setPrice(9999);
         goods.setAvailableStock(9999);
         goods.setStatus(1);
         goods.setCreateTime(new Date());
-        boolean insertResult= goodsDao.insertGoods(goods);
+        boolean insertResult= goodsService.insertGoods(goods);
         System.out.println(insertResult);
     }
     @Test
     public void queryGoodsTest(){
-        Goods goods=goodsDao.queryGoodsById(17);
+        Goods goods=goodsService.queryGoodsById(17);
         System.out.println(goods);
     }
     @Test

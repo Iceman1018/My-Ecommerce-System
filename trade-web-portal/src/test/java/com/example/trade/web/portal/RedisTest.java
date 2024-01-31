@@ -28,9 +28,4 @@ public class RedisTest {
     @Test
     public void setJmeterStockTest(){redisWorker.setValue("stock:2",10L);}
 
-    @Test
-    public void stockCheckTest() {
-        redisWorker.stockDeductCheck("stock:5");
-        System.out.println(redisWorker.getValueByKey("stock:5"));
-    }
 }
