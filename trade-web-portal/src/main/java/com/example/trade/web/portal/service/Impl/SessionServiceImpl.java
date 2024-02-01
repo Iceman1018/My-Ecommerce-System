@@ -26,9 +26,11 @@ public class SessionServiceImpl implements SessionService {
         Map<Long, CartItem> map=(Map<Long,CartItem>)session.getAttribute("userCart");
         for(Map.Entry<Long,CartItem> entry:map.entrySet()){
             CartItem cartItem=entry.getValue();
-            if(redisWorker.isItemInSet("invalid_cart_item",String.valueOf(cartItem.getDealId()))) {
+            log.info("cart id:{}",String.valueOf(cartItem.getId()));
+            if(redisWorker.isItemInSet("invalid_cart_item",String.valueOf(cartItem.getId()))) {
                 cartItem.setStatus(0);
-                redisWorker.removeItemFromSet("invalid_cart_item",String.valueOf(cartItem.getDealId()));
+                log.info("deleted data inconsistency, update session data");
+                redisWorker.removeItemFromSet("invalid_cart_item",String.valueOf(cartItem.getId()));
             }
         }
         session.setAttribute("userCart",map);
@@ -66,6 +68,7 @@ public class SessionServiceImpl implements SessionService {
         Map<Long,CartItem> map=(Map<Long,CartItem>)session.getAttribute("userCart");
         map.remove(cartItemId);
         session.setAttribute("userCart",map);
+        redisWorker.removeItemFromSet("invalid_cart_item",String.valueOf(cartItemId));
         cartPersistentSender.sendDeleteCartItemMessage(String.valueOf(cartItemId));
     }
 }

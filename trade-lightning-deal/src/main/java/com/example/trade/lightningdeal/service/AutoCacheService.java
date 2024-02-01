@@ -29,7 +29,7 @@ public class AutoCacheService {
 
     @Autowired
     CartItemExpirationMessageSender cartItemExpirationMessageSender;
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(fixedRate = 60000)
     public void updateRedisCache(){
         log.info("AntoCache Management Running");
         Date nowTime=new Date();

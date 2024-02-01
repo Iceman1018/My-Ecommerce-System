@@ -70,8 +70,12 @@ public class DealActivityServiceImpl implements DealActivityService {
         //1.查询对应的秒杀活动信息
         DealActivity dealActivity=dealActivityDao.findById(dealActivityId).orElse(null);
         if(dealActivity==null){
-            log.error("seckActivityId={} No such deal Activity",dealActivityId);
+            log.error("ActivityId={} No such deal Activity",dealActivityId);
             throw new RuntimeException("No such deal Activity");
+        }
+        if(dealActivity.getActivityStatus()==0){
+            log.error("ActivityId={} deal activity OVER",dealActivityId);
+            throw new RuntimeException("deal activity over");
         }
         //2.校验用户是否有购买资格
         if (!redisWorker.addLimit(dealActivityId, userId,num,dealActivity.getLimitPerUser())) {

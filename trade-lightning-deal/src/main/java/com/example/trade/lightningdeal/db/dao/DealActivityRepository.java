@@ -23,7 +23,7 @@ public interface DealActivityRepository extends JpaRepository<DealActivity,Long>
 
     @Modifying
     @Transactional
-    @Query("UPDATE DealActivity da SET da.activityStatus = 0 WHERE da.id = 1 and da.activityStatus = 1")
+    @Query("UPDATE DealActivity da SET da.activityStatus = 0 WHERE da.id = :id and da.activityStatus = 1")
     int updateDealActivityStatus(long id);
 
     @Modifying

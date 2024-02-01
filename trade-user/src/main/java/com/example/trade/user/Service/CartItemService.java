@@ -12,4 +12,12 @@ public interface CartItemService {
     boolean updateCartItemNum(Long itemId, Integer itemNum);
 
     void deleteCartItem(Long itemId);
+
+    boolean itemInvalidationByDealId(Long dealId);
+
+    boolean itemInvalidationByGoodsId(Long goodsId);
+
+    List<CartItem> itemInvalidationFind();
+    List<CartItem> findByDealId(Long dealId);
+    List<CartItem> findByGoodsId(Long goodsId);
 }

@@ -29,4 +29,23 @@ public class CartItemServiceImpl implements CartItemService {
         cartItemRepository.deleteById(itemId);
     }
 
+    public boolean itemInvalidationByDealId(Long dealId){
+        return cartItemRepository.itemInvalidationByDealId(dealId)>0;
+    }
+
+    public boolean itemInvalidationByGoodsId(Long goodsId){
+        return cartItemRepository.itemInvalidationByGoodsId(goodsId)>0;
+    }
+
+    public List<CartItem> itemInvalidationFind(){
+        return cartItemRepository.itemInvalidationFind();
+    }
+
+    public List<CartItem> findByDealId(Long dealId){
+        return cartItemRepository.findByDealId(dealId);
+    }
+    public List<CartItem> findByGoodsId(Long goodsId){
+        return cartItemRepository.findByGoodsId(goodsId);
+    }
+
 }

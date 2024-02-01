@@ -19,17 +19,23 @@ public interface CartItemRepository extends JpaRepository<CartItem,Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE CartItem i SET i.status = 0 WHERE i.id = :goodId")
+    @Query("UPDATE CartItem i SET i.status = 0 WHERE i.goodsId = :goodId")
     int itemInvalidationByGoodsId(long goodId);
 
     @Modifying
     @Transactional
-    @Query("UPDATE CartItem i SET i.status = 0 WHERE i.id = :dealId")
+    @Query("UPDATE CartItem i SET i.status = 0 WHERE i.dealId = :dealId")
     int itemInvalidationByDealId(long dealId);
 
-    @Modifying
-    @Transactional
     @Query("FROM CartItem WHERE status = 0")
     List<CartItem> itemInvalidationFind();
+
+    @Query("FROM CartItem WHERE dealId = :dealId")
+    List<CartItem> findByDealId(Long dealId);
+
+    @Query("FROM CartItem WHERE goodsId = :goodsId")
+    List<CartItem> findByGoodsId(Long goodsId);
+
+
 
 }

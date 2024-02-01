@@ -47,12 +47,12 @@ class TradeWebManagerApplicationTests {
     void addDealTest() {
         try {
             DealActivity dealActivity = new DealActivity();
-            dealActivity.setActivityName("Black Friday2");
+            dealActivity.setActivityName("Black Friday5");
             dealActivity.setGoodsId(new Long(16));
             dealActivity.setLimitPerUser(5);
 
-            String startTime = "2024-01-30 0:00:00";
-            String endTime = "2024-01-30 18:45:00";
+            String startTime = "2024-01-31 0:00:00";
+            String endTime = "2024-01-31 23:10:00";
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm");
             dealActivity.setStartTime(format.parse(startTime));
 
