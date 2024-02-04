@@ -1,3 +1,5 @@
+![show](https://github.com/Iceman1018/My-Ecommerce-System/assets/123434364/bb74b746-bfe5-4233-bab0-cfaa2e53390e)
+
 This is an e-commerce backend system with a microservices architecture designed by myself.
 
 The project has the following features:
